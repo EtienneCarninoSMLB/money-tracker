@@ -5,10 +5,15 @@ function saveData() {
 }
 
 function addEntry() {
-    const montant = document.getElementById("montant").value;
-    const qui = document.getElementById("qui").value;
-    const lieu = document.getElementById("lieu").value;
-    const commentaire = document.getElementById("commentaire").value;
+    const montantInput = document.getElementById("montant");
+    const quiSelect = document.getElementById("qui");
+    const lieuSelect = document.getElementById("lieu");
+    const commentaireInput = document.getElementById("commentaire");
+
+    const montant = montantInput.value;
+    const qui = quiSelect.value;
+    const lieu = lieuSelect.value;
+    const commentaire = commentaireInput.value;
 
     if (!montant) {
         alert("Montant obligatoire !");
@@ -23,9 +28,18 @@ function addEntry() {
         commentaire
     });
 
-    saveData();
+    // Sauvegarder dans localStorage
+    localStorage.setItem("data", JSON.stringify(data));
+
+    // Réinitialiser les champs
+    montantInput.value = "";
+    commentaireInput.value = "";
+    quiSelect.selectedIndex = 0;    // remet le premier choix par défaut
+    lieuSelect.selectedIndex = 0;   // remet le premier choix par défaut
+
     alert("Enregistré !");
 }
+
 
 document.getElementById("valider").onclick = addEntry;
 
@@ -68,6 +82,10 @@ document.getElementById("export").onclick = () => {
     });
 
     const bom = "\uFEFF";
+    let csv = `"Date";"Montant";"Qui";"Lieu";"Commentaire"\n`;
+    data.forEach(r => {
+        csv += `"${r.date}";"${r.montant}";"${r.qui}";"${r.lieu}";"${r.commentaire}"\n`;
+    });
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
 
