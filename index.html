@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Money Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="logo_teranga.png">
+    <meta name="theme-color" content="#0066cc">
+
+    <script defer src="app.js"></script>
+</head>
+<body>
+
+<h1>Money Tracker</h1>
+
+<div class="container">
+
+    <h2>Nouvelle Entrée</h2>
+
+    <label>Montant (€)</label>
+    <input id="montant" type="number" placeholder="0">
+
+    <label>Qui ?</label>
+    <select id="qui">
+        <option>Feth</option>
+        <option>Etienne</option>
+        <option>Stéphane</option>
+        <option>Amaury</option>
+        <option>Autre</option>
+    </select>
+
+    <label>Lieu</label>
+    <select id="lieu">
+        <option>Versailles</option>
+        <option>Concorde</option>
+        <option>Mondétour 12</option>
+        <option>Panorama</option>
+        <option>Parc 32</option>
+    </select>
+
+    <label>Commentaire</label>
+    <input id="commentaire" type="text" placeholder="Commentaire...">
+
+    <button id="valider" class="btn">Valider</button>
+    <button id="voir" class="btn-secondary">Voir Historique</button>
+    <button id="export" class="btn-secondary">Exporter Excel</button>
+
+</div>
+
+<!-- Tableau Historique -->
+<div id="historique" class="hidden">
+    <h2>Historique</h2>
+    <table id="tableau">
+        <thead>
+            <tr>
+                <th>Date</th><th>Montant</th><th>Qui</th><th>Lieu</th><th>Commentaire</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <button id="back" class="btn">Retour</button>
+</div>
+
+</body>
+</html>
