@@ -67,6 +67,7 @@ document.getElementById("export").onclick = () => {
         csv += `${r.date};${r.montant};${r.qui};${r.lieu};${r.commentaire}\n`;
     });
 
+    const bom = "\uFEFF";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
 
