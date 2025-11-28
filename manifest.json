@@ -7,14 +7,14 @@
     "theme_color": "#0078ff",
     "icons": [
         {
-            "src": "logo_teranga.png",
+            "src": "logo_teranga.ico",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "icon/ico"
         },
         {
-            "src": "logo_teranga.png",
+            "src": "logo_teranga.ico",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "icon/ico"
         }
     ]
 }
