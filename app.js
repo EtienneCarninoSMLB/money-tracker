@@ -82,7 +82,6 @@ document.getElementById("export").onclick = () => {
     });
 
     const bom = "\uFEFF";
-    let csv = `"Date";"Montant";"Qui";"Lieu";"Commentaire"\n`;
     data.forEach(r => {
         csv += `"${r.date}";"${r.montant}";"${r.qui}";"${r.lieu}";"${r.commentaire}"\n`;
     });
