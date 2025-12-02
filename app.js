@@ -8,8 +8,8 @@ const API_KEY = "AIzaSyAyq3Sd8kDDSmwDY8Q5VWDTV-ay48FSrm0";
 const RANGE = "Feuille1";
 
 // Google Apps Script (écriture)
-const WRITE_URL = "https://script.google.com/macros/s/AKfycbwoWJVxVZ0Ff2OfUJuu2eKLFJCLM_5WzaE9wqjNBD8sGWJnVuYwpHF3T9uhmIJ64Axr9A/exec";
-const SECRET_TOKEN = "TERANGA_2025";
+const WRITE_URL = "https://script.google.com/macros/s/AKfycbzGtKADj4P48CFyOcsG_c6iiOsvh4Q72i_X8KH7BuSAN5rGZxPRYYH-wWhQBQEH5aaW0A/exec";
+const SECRET_TOKEN = "NjNAo5l_flPQfsl3";
 
 // ===============================
 //  LECTURE DES DONNÉES
@@ -77,7 +77,7 @@ async function sendData(payload) {
 
 // ===============================
 //  AFFECTATION DES HANDLERS APRES DOM READY
-// ===============================
+// ===============================  
 document.addEventListener("DOMContentLoaded", () => {
     // Références sûres aux éléments
     const btnValider = document.getElementById("valider");
