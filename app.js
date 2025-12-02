@@ -8,7 +8,7 @@ const API_KEY = "AIzaSyAyq3Sd8kDDSmwDY8Q5VWDTV-ay48FSrm0";
 const RANGE = "Feuille1";
 
 // Google Apps Script (écriture)
-const WRITE_URL = "https://script.google.com/macros/s/AKfycbzGtKADj4P48CFyOcsG_c6iiOsvh4Q72i_X8KH7BuSAN5rGZxPRYYH-wWhQBQEH5aaW0A/exec";
+const WRITE_URL = "https://script.google.com/macros/s/AKfycbyHKEUQ11FIFCwxSOg-9jls8S63bNo_YNc8JPFs2vZk2iO0hF6fMtPAxmvwOrDFAk7HgA/exec";
 const SECRET_TOKEN = "NjNAo5l_flPQfsl3";
 
 // ===============================
