@@ -31,7 +31,7 @@ function updateTable(data) {
 // ===============================
 async function loadData() {
     try {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?alt=json&key=VOTRE_API_KEY`;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?alt=json&key=AIzaSyAyq3Sd8kDDSmwDY8Q5VWDTV-ay48FSrm0`;
         const res = await fetch(url);
         const json = await res.json();
         if (!json.values) return [];
