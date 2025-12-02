@@ -5,7 +5,7 @@
 // Google Sheets
 const SHEET_ID = "1ZwR_Nt6t_ppZ2LeG-4GmettHI2c4Dkh7-o2ABm_Zg-I";
 const API_KEY = "AIzaSyAyq3Sd8kDDSmwDY8Q5VWDTV-ay48FSrm0";
-const RANGE = "Feuille1";
+const RANGE = "Feuille 1";
 
 // Google Apps Script (écriture)
 const WRITE_URL = "https://script.google.com/macros/s/AKfycbyHKEUQ11FIFCwxSOg-9jls8S63bNo_YNc8JPFs2vZk2iO0hF6fMtPAxmvwOrDFAk7HgA/exec";
