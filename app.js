@@ -1,97 +1,153 @@
-let data = JSON.parse(localStorage.getItem("data") || "[]");
+// ===============================
+//  CONFIGURATION
+// ===============================
 
-function saveData() {
-    localStorage.setItem("data", JSON.stringify(data));
+// Google Sheets
+const SHEET_ID = "1ZwR_Nt6t_ppZ2LeG-4GmettHI2c4Dkh7-o2ABm_Zg-I";
+const API_KEY = "AIzaSyAyq3Sd8kDDSmwDY8Q5VWDTV-ay48FSrm0";
+const RANGE = "Feuille1";
+
+// Google Apps Script (écriture)
+const WRITE_URL = "https://script.google.com/macros/s/AKfycbwoWJVxVZ0Ff2OfUJuu2eKLFJCLM_5WzaE9wqjNBD8sGWJnVuYwpHF3T9uhmIJ64Axr9A/exec";
+const SECRET_TOKEN = "TERANGA_2025";  // même token que dans ton Apps Script
+
+// ===============================
+//  LECTURE DES DONNÉES
+// ===============================
+
+async function loadData() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?alt=json&key=${API_KEY}`;
+
+    const res = await fetch(url);
+    const json = await res.json();
+
+    if (!json.values) return [];
+
+    // Enlever la première ligne (en-têtes)
+    const rows = json.values.slice(1).map(r => ({
+        date: r[0] || "",
+        montant: r[1] || "",
+        qui: r[2] || "",
+        lieu: r[3] || "",
+        commentaire: r[4] || ""
+    }));
+
+    updateTable(rows);
+    return rows;
 }
 
-function addEntry() {
-    const montantInput = document.getElementById("montant");
-    const quiSelect = document.getElementById("qui");
-    const lieuSelect = document.getElementById("lieu");
-    const commentaireInput = document.getElementById("commentaire");
+// ===============================
+//  AFFICHAGE DU TABLEAU
+// ===============================
 
-    const montant = montantInput.value;
-    const qui = quiSelect.value;
-    const lieu = lieuSelect.value;
-    const commentaire = commentaireInput.value;
+function updateTable(data) {
+    const tbody = document.getElementById("table-body");
+    tbody.innerHTML = "";
 
-    if (!montant) {
-        alert("Montant obligatoire !");
+    data.forEach(entry => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${entry.date}</td>
+            <td>${entry.montant}</td>
+            <td>${entry.qui}</td>
+            <td>${entry.lieu}</td>
+            <td>${entry.commentaire}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+// ===============================
+//  AJOUT D’UNE LIGNE (WRITE)
+// ===============================
+
+async function sendData(payload) {
+    const res = await fetch(WRITE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    return res.json();
+}
+
+// ===============================
+//  BOUTON VALIDER
+// ===============================
+
+document.getElementById("btn-valider").onclick = async () => {
+    const montant = document.getElementById("montant").value;
+    const qui = document.getElementById("qui").value;
+    const lieu = document.getElementById("lieu").value;
+    const commentaire = document.getElementById("commentaire").value;
+
+    if (!montant || !qui || !lieu) {
+        alert("Merci de remplir au minimum Montant + Qui + Lieu");
         return;
     }
 
-    data.push({
-        date: new Date().toLocaleString(),
+    const payload = {
+        token: SECRET_TOKEN,
+        date: new Date().toLocaleString("fr-FR"),
         montant,
         qui,
         lieu,
         commentaire
-    });
+    };
 
-    // Sauvegarder dans localStorage
-    localStorage.setItem("data", JSON.stringify(data));
+    const result = await sendData(payload);
 
-    // Réinitialiser les champs
-    montantInput.value = "";
-    commentaireInput.value = "";
-    quiSelect.selectedIndex = 0;    // remet le premier choix par défaut
-    lieuSelect.selectedIndex = 0;   // remet le premier choix par défaut
+    if (result.success) {
+        alert("Enregistré !");
+        resetForm();
+        loadData();
+    } else {
+        alert("Erreur lors de l’enregistrement !");
+    }
+};
 
-    alert("Enregistré !");
+// ===============================
+//  RESET FORMULAIRE
+// ===============================
+
+function resetForm() {
+    document.getElementById("montant").value = "";
+    document.getElementById("qui").value = "";
+    document.getElementById("lieu").value = "";
+    document.getElementById("commentaire").value = "";
 }
 
+// ===============================
+//  EXPORT CSV
+// ===============================
 
-document.getElementById("valider").onclick = addEntry;
+document.getElementById("btn-export").onclick = async () => {
+    const data = await loadData();
 
-
-// ----------- HISTORIQUE -----------------
-
-document.getElementById("voir").onclick = () => {
-    document.querySelector(".container").classList.add("hidden");
-    document.getElementById("historique").classList.remove("hidden");
-
-    const tbody = document.querySelector("#tableau tbody");
-    tbody.innerHTML = "";
+    let csv = `"Date";"Montant";"Qui";"Lieu";"Commentaire"\n`;
 
     data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${row.date}</td>
-            <td>${row.montant}</td>
-            <td>${row.qui}</td>
-            <td>${row.lieu}</td>
-            <td>${row.commentaire}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-};
-
-document.getElementById("back").onclick = () => {
-    document.getElementById("historique").classList.add("hidden");
-    document.querySelector(".container").classList.remove("hidden");
-};
-
-
-// -------- EXPORT EXCEL ---------
-
-document.getElementById("export").onclick = () => {
-    let csv = "Date;Montant;Qui;Lieu;Commentaire\n";
-
-    data.forEach(r => {
-        csv += `${r.date};${r.montant};${r.qui};${r.lieu};${r.commentaire}\n`;
+        csv += `"${row.date}";"${row.montant}";"${row.qui}";"${row.lieu}";"${row.commentaire}"\n`;
     });
 
-    const bom = "\uFEFF";
-    data.forEach(r => {
-        csv += `"${r.date}";"${r.montant}";"${r.qui}";"${r.lieu}";"${r.commentaire}"\n`;
-    });
-    const blob = new Blob([csv], { type: "text/csv" });
+    const bom = "\uFEFF"; // UTF-8 BOM
+    const blob = new Blob([bom + csv], { type: "text/csv;charset=utf-8;" });
+
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement("a");
+
     a.href = url;
     a.download = "export.csv";
     a.click();
 
     URL.revokeObjectURL(url);
 };
+
+// ===============================
+//  AUTO-REFRESH (toutes 5s)
+// ===============================
+
+loadData();
+setInterval(loadData, 5000);
