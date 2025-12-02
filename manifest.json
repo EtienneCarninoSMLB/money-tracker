@@ -1,20 +1,21 @@
 {
     "name": "Money Tracker",
     "short_name": "MoneyTrack",
-    "start_url": "index.html",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#0078ff",
+
     "icons": [
         {
-            "src": "logo_teranga.ico",
+            "src": "icons/icon-192.png",
             "sizes": "192x192",
-            "type": "icon/ico"
+            "type": "image/png"
         },
         {
-            "src": "logo_teranga.ico",
+            "src": "icons/icon-512.png",
             "sizes": "512x512",
-            "type": "icon/ico"
+            "type": "image/png"
         }
     ]
 }

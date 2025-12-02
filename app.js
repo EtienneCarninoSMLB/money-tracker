@@ -9,7 +9,7 @@ const RANGE = "Feuille1";
 
 // Google Apps Script (écriture)
 const WRITE_URL = "https://script.google.com/macros/s/AKfycbwoWJVxVZ0Ff2OfUJuu2eKLFJCLM_5WzaE9wqjNBD8sGWJnVuYwpHF3T9uhmIJ64Axr9A/exec";
-const SECRET_TOKEN = "TERANGA_2025";  // même token que dans ton Apps Script
+const SECRET_TOKEN = "NjNAo5l_flPQfsl3";  // même token que dans ton Apps Script
 
 // ===============================
 //  LECTURE DES DONNÉES
