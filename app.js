@@ -1,24 +1,90 @@
 // ===============================
-//  CONFIGURATION
+// CONFIGURATION
 // ===============================
+const SHEET_ID = "1ZwR_Nt6t_ppZ2LeG-4GmettHI2c4Dkh7-o2ABm_Zg-I";
+const RANGE = "Feuille 1";
 const WRITE_URL = "https://script.google.com/macros/s/AKfycbyqfvpvkbZC-xdAL5G1aHnfyh-Pm0qWF13uF4B4yUHrmrVf_sI2DSXpk0tGLhkJjCHLsg/exec";
 const SECRET_TOKEN = "NjNAo5l_flPQfsl3";
 
 // ===============================
-//  AFFECTATION DES HANDLERS APRES DOM READY
-// ===============================  
+// AFFICHAGE TABLEAU
+// ===============================
+function updateTable(data) {
+    const tbody = document.querySelector("#tableau tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    data.forEach(entry => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${entry.date}</td>
+            <td>${entry.montant}</td>
+            <td>${entry.qui}</td>
+            <td>${entry.lieu}</td>
+            <td>${entry.commentaire}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ===============================
+// LECTURE DES DONNÉES
+// ===============================
+async function loadData() {
+    try {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?alt=json&key=VOTRE_API_KEY`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if (!json.values) return [];
+        const rows = json.values.slice(1).map(r => ({
+            date: r[0] || "",
+            montant: r[1] || "",
+            qui: r[2] || "",
+            lieu: r[3] || "",
+            commentaire: r[4] || ""
+        }));
+        updateTable(rows);
+        return rows;
+    } catch (e) {
+        console.error("loadData error:", e);
+        return [];
+    }
+}
+
+// ===============================
+// ENVOI D’UNE LIGNE (GET)
+// ===============================
+async function sendData(params) {
+    const query = new URLSearchParams(params).toString();
+    const url = `${WRITE_URL}?${query}`;
+
+    try {
+        const res = await fetch(url);
+        return await res.json();
+    } catch (e) {
+        console.error("sendData error:", e);
+        return { success: false, error: e.message };
+    }
+}
+
+// ===============================
+// RESET FORMULAIRE
+// ===============================
+function resetForm() {
+    document.getElementById("montant").value = "";
+    document.getElementById("qui").value = "";
+    document.getElementById("lieu").value = "";
+    document.getElementById("commentaire").value = "";
+}
+
+// ===============================
+// HANDLERS
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
     const btnValider = document.getElementById("valider");
     const btnVoir = document.getElementById("voir");
     const btnExport = document.getElementById("export");
     const btnBack = document.getElementById("back");
-    const container = document.querySelector(".container");
-    const historique = document.getElementById("historique");
-    const tbody = document.querySelector("#tableau tbody");
 
-    // ===============================
-    //  VALIDER
-    // ===============================
     btnValider.addEventListener("click", async () => {
         const montant = document.getElementById("montant").value;
         const qui = document.getElementById("qui").value;
@@ -33,82 +99,46 @@ document.addEventListener("DOMContentLoaded", () => {
         const payload = {
             token: SECRET_TOKEN,
             date: new Date().toLocaleString("fr-FR"),
-            montant,
-            qui,
-            lieu,
-            commentaire
+            montant, qui, lieu, commentaire
         };
 
-        try {
-            // Utilisation de 'no-cors' pour éviter le blocage
-            await fetch(WRITE_URL + `?payload=${encodeURIComponent(JSON.stringify(payload))}`, {
-                method: "GET",
-                mode: "no-cors"
-            });
+        const result = await sendData(payload);
+
+        if (result.success) {
             resetForm();
+            await loadData();
             alert("Enregistré !");
-        } catch (e) {
-            console.error("sendData error:", e);
-            alert("Erreur lors de l'enregistrement.");
+        } else {
+            alert("Erreur lors de l'enregistrement");
         }
     });
 
-    // ===============================
-    //  VOIR
-    // ===============================
-    btnVoir.addEventListener("click", () => {
-        container.classList.add("hidden");
-        historique.classList.remove("hidden");
-        loadData();
+    btnVoir.addEventListener("click", async () => {
+        document.querySelector(".container").classList.add("hidden");
+        document.getElementById("historique").classList.remove("hidden");
+        await loadData();
     });
 
-    // ===============================
-    //  BACK
-    // ===============================
     btnBack.addEventListener("click", () => {
-        container.classList.remove("hidden");
-        historique.classList.add("hidden");
+        document.querySelector(".container").classList.remove("hidden");
+        document.getElementById("historique").classList.add("hidden");
     });
 
-    // ===============================
-    //  EXPORT CSV
-    // ===============================
-    btnExport.addEventListener("click", () => {
-        const rows = Array.from(tbody.querySelectorAll("tr"));
+    btnExport.addEventListener("click", async () => {
+        const data = await loadData();
         let csv = `"Date";"Montant";"Qui";"Lieu";"Commentaire"\n`;
-        rows.forEach(tr => {
-            const cells = Array.from(tr.children).map(td => `"${td.textContent.replace(/"/g,'""')}"`);
-            csv += cells.join(";") + "\n";
+        data.forEach(row => {
+            const safe = v => (v || "").toString().replace(/"/g, '""');
+            csv += `"${safe(row.date)}";"${safe(row.montant)}";"${safe(row.qui)}";"${safe(row.lieu)}";"${safe(row.commentaire)}"\n`;
         });
         const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url;
+        a.href = URL.createObjectURL(blob);
         a.download = "export.csv";
         a.click();
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(a.href);
     });
 
-    // ===============================
-    //  CHARGEMENT DES DONNÉES
-    // ===============================
-    async function loadData() {
-        try {
-            const res = await fetch(WRITE_URL + "?action=get", { method: "GET", mode: "no-cors" });
-            // Impossible de lire le JSON en 'no-cors', donc juste afficher ce qu'on a côté Apps Script
-            // Pour voir les données réelles, on peut ouvrir la sheet directement
-        } catch (e) {
-            console.warn("Impossible de charger les données côté client en raison de CORS. Voir la Google Sheet directement.");
-        }
-    }
-
-    // ===============================
-    //  RESET FORMULAIRE
-    // ===============================
-    function resetForm() {
-        document.getElementById("montant").value = "";
-        document.getElementById("qui").value = "";
-        document.getElementById("lieu").value = "";
-        document.getElementById("commentaire").value = "";
-    }
+    loadData();
+    setInterval(loadData, 5000);
 });
